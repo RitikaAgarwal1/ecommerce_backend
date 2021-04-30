@@ -1,9 +1,9 @@
-const express = require('express')
+const express = require('express');
 const app = express();
+const cors = require('cors');
 const userRouter = require('./routers/user');
 const productRouter = require('./routers/products');
 const promotionRouter = require('./routers/promotion');
-const cors = require('./library/config');
 
 const port = process.env.PORT || 3000;
 
