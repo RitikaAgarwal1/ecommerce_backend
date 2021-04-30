@@ -26,7 +26,8 @@ router.post('/addProduct', validate(productValidate, {}, {}), async (req, res) =
             category: req.body.category,
             detail: req.body.detail,
             brand: req.body.brand,
-            size: req.body.size
+            size: req.body.size,
+            pic: req.body.pic
         };
         const result = await exeQuery(insertQuery('products'), body);
         console.log(result);
@@ -67,7 +68,7 @@ router.post('/addBulkProduct', validate(bulkProductValidate, {}, {}), async (req
     }
     try {
 
-        const model = { title: null, price: null, quantity: null, availiblity: null, is_new: null, color: null, seller_id: null, offer: null, shipping_price: null, category: null, detail: null, brand: null, size: null };
+        const model = { title: null, price: null, quantity: null, availiblity: null, is_new: null, color: null, seller_id: null, offer: null, shipping_price: null, category: null, detail: null, brand: null, size: null, pic:null };
 
         let reqBody = req.body.map(e => {
             const reqData = Object.assign(model, e);

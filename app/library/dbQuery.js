@@ -23,10 +23,16 @@ const deleteBySelection = (tableName) => {
     return `DELETE FROM ${tableName} WHERE id IN (?)`
 }
 
+//for deleting all data from table
+const deleteAllData = (tableName) => {
+    return `DELETE FROM ${tableName}`
+}
+
 module.exports = {
     insertQuery,
     fetchAllData,
     insertBulkData,
     deleteById,
-    deleteBySelection
+    deleteBySelection,
+    deleteAllData
 };

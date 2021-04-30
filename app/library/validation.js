@@ -13,6 +13,7 @@ const registration = {
         created_on: Joi.date(),
         company_name: Joi.string(),
         uuid: Joi.string(),
+        pic: Joi.string()
     })
 }
 
@@ -31,7 +32,8 @@ const productValidate = {
         category: Joi.string().required(),
         detail: Joi.string().required(),
         brand: Joi.string().required(),
-        size: Joi.string().required().uppercase()
+        size: Joi.string().required().uppercase(),
+        pic: Joi.string().required()
     })
 }
 
@@ -51,7 +53,8 @@ const bulkProductValidate = {
             category: Joi.string().required(),
             detail: Joi.string().required(),
             brand: Joi.string().required(),
-            size: Joi.string().required().uppercase()
+            size: Joi.string().required().uppercase(),
+            pic: Joi.string().required()
         })
     )
 }
@@ -63,9 +66,17 @@ const bulkDeleteValidate = {
     })
 }
 
+//for adding promotional banner
+const bannerValidate = {
+    body: Joi.object({
+        banner: Joi.string().required()
+    })
+}
+
 module.exports = {
     registration,
     productValidate,
     bulkProductValidate,
-    bulkDeleteValidate
+    bulkDeleteValidate,
+    bannerValidate
 }

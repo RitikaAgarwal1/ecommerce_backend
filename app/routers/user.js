@@ -23,7 +23,8 @@ router.post('/register', validate(registration, {}, {}), async (req, res) => {
             user_role: req.body.user_role,
             created_on: new Date(),
             company_name: req.body.company_name,
-            uuid: req.body.uuid
+            uuid: req.body.uuid,
+            pic: req.body.pic? req.body.pic : null
         };
         const result = await exeQuery(insertQuery('users'), body);
         console.log(result);
