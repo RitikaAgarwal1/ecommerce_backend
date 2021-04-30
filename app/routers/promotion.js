@@ -59,3 +59,5 @@ router.delete('/deleteBanner', async (req, res) => {
         });
     }
 });
+
+module.exports = router;

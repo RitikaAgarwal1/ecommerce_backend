@@ -2,6 +2,7 @@ const express = require('express')
 const app = express();
 const userRouter = require('./routers/user');
 const productRouter = require('./routers/products');
+const promotionRouter = require('./routers/promotion');
 
 const port = process.env.PORT || 3000;
 
@@ -12,3 +13,4 @@ app.listen(port, () =>
 app.use(express.json());
 app.use(userRouter);
 app.use(productRouter);
+app.use(promotionRouter);
