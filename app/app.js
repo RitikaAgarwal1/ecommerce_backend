@@ -20,6 +20,17 @@ app.use(function(req, res, next) {
   next()
 });
 
+app.get('/', async (req, res) => {
+  try {
+      res.send({Message: "We are in API of Ecommerce Website"});
+  } catch (e) {
+      console.log('error', e);
+      res.status(500).send({
+          Error: e.message
+      });
+  }
+});
+
 app.listen(port, () => 
   console.log(`App is listening on port ${port}.`)
 );
