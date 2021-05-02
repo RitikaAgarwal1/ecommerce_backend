@@ -1,26 +1,68 @@
 const express = require('express');
 const router = new express.Router();
 const { validate, ValidationError } = require('express-validation');
-const { bannerValidate } = require('../library/validation');
 const { exeQuery } = require('../library/db');
 const { insertQuery, fetchAllData, deleteAllData } = require('../library/dbQuery');
+const { createBuffer } = require('../library/upload');
+
+
+// //for saving file in public folder
+
+// const storage = multer.diskStorage({
+//     destination: function (req, file, cb) {
+//         cb(null, 'app/public')
+//     },
+//     filename: (req, file, cb) => {
+//         cb(null, file.originalname)
+//     }
+// });
+
+// const upload = multer({ storage: storage }).single('file')
+
+// router.post('/upload', function (req, res) {
+
+//     upload(req, res, function (err) {
+//         if (err instanceof multer.MulterError) {
+//             console.log('27', err);
+//             return res.status(500).json(err)
+//         } else if (err) {
+//             console.log('30', err);
+//             return res.status(500).json(err)
+//         }
+//         console.log('upload file', req.file);
+//         return res.status(200).send(req.file)
+//     })
+// });
+
+//for getting buffer of files
+
+// router.post('/advertisement', async(req, res) => {
+//     console.log('ad', req.files, req.file);
+//     let form = new formidable.IncomingForm();
+//     form.keepExtensions = true;
+//     form.parse(req, (err, fields, files) => {
+//         if(err){
+//             console.log('error  at form parsing', err);
+//             return res.status(400).json({
+//                 error: 'Image could not be uploaded!'
+//             });
+//         }
+//         if(files.file){
+//             const data = fs.readFileSync(files.file.path);
+//             const photoType = files.file.type;
+//             console.log('data', data, photoType);
+//         }
+//     })
+// });
 
 //for adding banner image
-router.post('/addBanner', validate(bannerValidate, {}, {}), async (req, res) => {
-    if (!req.body) {
-        res.status(404).send({
-            Error: 'Payload is required!'
-        });
-    }
+router.post('/addBanner', async (req, res) => {
     try {
-        const body = {
-            banner: req.body.banner
-        };
+        const body = await createBuffer(req);
         const result = await exeQuery(insertQuery('promotion'), body);
         console.log(result);
         res.status(200).send({
-            message: 'Successfully added banner!',
-            data: req.body
+            message: 'Successfully added banner!'
         });
     } catch (err) {
         if (err instanceof ValidationError) {
@@ -37,7 +79,8 @@ router.get('/bannerDetails', async (req, res) => {
     try {
         const result = await exeQuery(fetchAllData('promotion'));
         console.log(result);
-        res.send(result);
+        res.set('Content-Type', result[0].fileType);
+        res.send(result[0].buffer);
     } catch (e) {
         console.log('error', e);
         res.status(500).send({
@@ -51,8 +94,10 @@ router.delete('/deleteBanner', async (req, res) => {
     try {
         const result = await exeQuery(deleteAllData('promotion'));
         console.log(result);
-        res.send(result);
-    } catch (e){
+        res.send({
+            message: "Banner successfully deleted!"
+        });
+    } catch (e) {
         console.log('error', e);
         res.status(500).send({
             Error: e.message

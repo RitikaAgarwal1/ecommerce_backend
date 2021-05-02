@@ -66,17 +66,9 @@ const bulkDeleteValidate = {
     })
 }
 
-//for adding promotional banner
-const bannerValidate = {
-    body: Joi.object({
-        banner: Joi.string().required()
-    })
-}
-
 module.exports = {
     registration,
     productValidate,
     bulkProductValidate,
-    bulkDeleteValidate,
-    bannerValidate
+    bulkDeleteValidate
 }

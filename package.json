@@ -2,18 +2,33 @@
   "name": "ecommerce",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "app/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app/app.js"
+    "start": "nodemon app/app.js",
+    "deploy": "vercel",
+    "build": "vercel --prod",
+    "dev": "vercel dev"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "connect-form": "^0.2.1",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-validation": "^3.0.8",
+    "formidable": "^1.2.2",
+    "lodash": "^4.17.21",
+    "multer": "^1.4.2",
     "mysql": "^2.18.1",
-    "nodemon": "^2.0.7"
+    "nodemon": "^2.0.7",
+    "now": "^21.0.1",
+    "serve": "^11.3.2",
+    "vercel": "^22.0.1",
+    "webpack": "^5.36.2"
+  },
+  "devDependencies": {
+    "@vercel/node": "^1.10.0",
+    "webpack-cli": "^4.6.0"
   }
 }
