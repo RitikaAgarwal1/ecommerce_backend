@@ -79,8 +79,14 @@ router.get('/bannerDetails', async (req, res) => {
     try {
         const result = await exeQuery(fetchAllData('promotion'));
         console.log(result);
-        res.set('Content-Type', result[0].fileType);
-        res.send(result[0].buffer);
+        if (result.length > 0) {
+            res.set('Content-Type', result[0].fileType);
+            res.send(result[0].buffer);
+        } else {
+            res.send({
+                message: "No data!"
+            });
+        }
     } catch (e) {
         console.log('error', e);
         res.status(500).send({
@@ -94,9 +100,16 @@ router.delete('/deleteBanner', async (req, res) => {
     try {
         const result = await exeQuery(deleteAllData('promotion'));
         console.log(result);
-        res.send({
-            message: "Banner successfully deleted!"
-        });
+        if (result.affectedRows >= 0) {
+            res.send({
+                message: "There is no image for deleting!"
+            });
+        } else {
+            res.send({
+                message: "Banner successfully deleted!"
+            });
+        }
+
     } catch (e) {
         console.log('error', e);
         res.status(500).send({
