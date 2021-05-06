@@ -1,12 +1,11 @@
 const express = require('express');
 const router = new express.Router();
-const { validate, ValidationError } = require('express-validation');
 const { productValidate, bulkProductValidate, bulkDeleteValidate } = require('../library/validation');
 const { exeQuery, getConnection } = require('../library/db');
 const { insertQuery, fetchAllData, insertBulkData, deleteById, deleteBySelection } = require('../library/dbQuery');
 
 //for adding product details
-router.post('/addProduct', validate(productValidate, {}, {}), async (req, res) => {
+router.post('/addProduct', async (req, res) => {
     if (!req.body) {
         res.status(404).send({
             Error: 'Payload is required!'
@@ -29,6 +28,7 @@ router.post('/addProduct', validate(productValidate, {}, {}), async (req, res) =
             size: req.body.size,
             pic: req.body.pic
         };
+        await productValidate.validateAsync(body);
         const result = await exeQuery(insertQuery('products'), body);
         console.log(result);
         res.status(200).send({
@@ -36,12 +36,16 @@ router.post('/addProduct', validate(productValidate, {}, {}), async (req, res) =
             data: req.body
         });
     } catch (err) {
-        if (err instanceof ValidationError) {
+        if (err.isJoi) {
+            return res.status(422).json({
+                Error: err.details[0].message
+            });
+        } else {
             console.log(err);
-            return res.status(err.statusCode).json(err)
+            return res.status(500).json({
+                Error: err
+            });
         }
-        console.log(err);
-        return res.status(500).json(err)
     };
 });
 
@@ -60,20 +64,21 @@ router.get('/productDetails', async (req, res) => {
 });
 
 //for adding multiple product details
-router.post('/addBulkProduct', validate(bulkProductValidate, {}, {}), async (req, res) => {
+router.post('/addBulkProduct', async (req, res) => {
     if (!req.body) {
         res.status(404).send({
             Error: 'Payload is required!'
         });
     }
     try {
-
         const model = { title: null, price: null, quantity: null, availiblity: null, is_new: null, color: null, seller_id: null, offer: null, shipping_price: null, category: null, detail: null, brand: null, size: null, pic:null };
 
         let reqBody = req.body.map(e => {
             const reqData = Object.assign(model, e);
             return Object.values(reqData);
         });
+
+        await bulkProductValidate.validateAsync(req.body);
 
         const result = await exeQuery(insertBulkData('products', Object.keys(model).join(', ')), [reqBody]);
         console.log('result', result);
@@ -82,12 +87,17 @@ router.post('/addBulkProduct', validate(bulkProductValidate, {}, {}), async (req
             data: req.body
         });
     } catch (err) {
-        if (err instanceof ValidationError) {
+        if (err.isJoi) {
             console.log(err);
-            return res.status(err.statusCode).json(err)
+            return res.status(422).json({
+                Error: err.details[0].message
+            });
+        } else {
+            console.log(err);
+            return res.status(500).json({
+                Error: err
+            });
         }
-        console.log(err);
-        return res.status(500).json(err)
     };
 });
 
@@ -113,25 +123,30 @@ router.delete('/deleteProduct', async (req, res) => {
 });
 
 //for deleting multiple products on selection
-router.delete('/deleteBulkProducts', validate(bulkDeleteValidate, {}, {}), async (req, res) => {
+router.delete('/deleteBulkProducts', async (req, res) => {
     if (!req.body) {
         res.status(404).send({
             Error: 'Payload is required!'
         });
     }
     try {
+        await bulkDeleteValidate.validateAsync(req.body);
         const result = await exeQuery(deleteBySelection('products'), [req.body.ids]);
         console.log('result', result);
         res.send({
             message: `Successfully deleted ids ${req.body.ids.join(', ')}`
         });
     } catch (e) {
-        if (err instanceof ValidationError) {
-            console.log(err);
-            return res.status(err.statusCode).json(err)
+        if (e.isJoi) {
+            return res.status(422).json({
+                Error: e.details[0].message
+            });
+        } else {
+            console.log(e);
+            return res.status(500).json({
+                Error: e.details[0].message
+            });
         }
-        console.log(err);
-        return res.status(500).json(err)
     };
 });
 

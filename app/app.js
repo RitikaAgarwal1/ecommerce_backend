@@ -1,6 +1,8 @@
 const express = require('express');
 const app = express();
+require('dotenv').config();
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const userRouter = require('./routers/user');
 const productRouter = require('./routers/products');
 const promotionRouter = require('./routers/promotion');
@@ -36,6 +38,7 @@ app.listen(port, () =>
 );
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(userRouter);
 app.use(productRouter);
 app.use(promotionRouter);

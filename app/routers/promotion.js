@@ -1,6 +1,5 @@
 const express = require('express');
 const router = new express.Router();
-const { validate, ValidationError } = require('express-validation');
 const { exeQuery } = require('../library/db');
 const { insertQuery, fetchAllData, deleteAllData } = require('../library/dbQuery');
 const { createBuffer } = require('../library/upload');
@@ -65,10 +64,6 @@ router.post('/addBanner', async (req, res) => {
             message: 'Successfully added banner!'
         });
     } catch (err) {
-        if (err instanceof ValidationError) {
-            console.log(err);
-            return res.status(err.statusCode).json(err)
-        }
         console.log(err);
         return res.status(500).json(err)
     };
@@ -100,7 +95,7 @@ router.delete('/deleteBanner', async (req, res) => {
     try {
         const result = await exeQuery(deleteAllData('promotion'));
         console.log(result);
-        if (result.affectedRows >= 0) {
+        if (result.affectedRows == 0) {
             res.send({
                 message: "There is no image for deleting!"
             });
