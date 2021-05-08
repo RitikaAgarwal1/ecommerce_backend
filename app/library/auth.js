@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken');
 const expressJwt = require('express-jwt');//for authentication check
 
 exports.auth = expressJwt({
@@ -6,22 +7,12 @@ exports.auth = expressJwt({
     userProperty: 'auth'
 });
 
-exports.isAuth = (req, res) => {
-    let user = req.profile && req.auth && req.profile.uuid == req.auth.uuid;
-    console.log('profile', req.profile);
-    console.log('22', req.auth.uuid);
-    console.log(req.auth);
+exports.isAuth = (req, res, next) => {
+    let user = req.auth && req.params.userId == req.auth._id;
     if (!user){
         return res.status(403).json({
             Error: "Access Denied!"
         })
     }
-};
-
-exports.isAdmin = (req, res) => {
-   if (req.profile.user_role === 'USER'){
-       return res.status(403).json({
-           Error: "Only Admins have access"
-       })
-   }
+    next();
 };

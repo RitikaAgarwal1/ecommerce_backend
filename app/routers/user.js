@@ -6,7 +6,7 @@ const fs = require('fs');
 const { exeQuery, getConnection } = require('../library/db');
 const { insertQuery, fetchAllData, deleteById, deleteBySelection, getUserByEmail, getUserById } = require('../library/dbQuery');
 const jwt = require('jsonwebtoken');//to generate signed token
-const {auth, isAuth, isAdmin} = require('../library/auth');
+const {auth, isAuth} = require('../library/auth');
 
 //for signing out
 router.get('/signout', async (req, res) => {
@@ -37,12 +37,11 @@ router.post('/signin', async (req, res) => {
                 Error: "Email and password doesnt match!"
             });
         } else {
-            const token = jwt.sign({ _id: userDetails.uuid }, process.env.JWT_SECRET);
+            const token = jwt.sign({ _id: userDetails[0].uuid }, process.env.JWT_SECRET);
             res.cookie('access-token', token, { expire: new Date() + 9999 });
-            console.log('userDetails', userDetails[0].pwd == password);
             const { uuid, first_name, last_name, email, user_role } = userDetails[0];
             res.json({
-                token, userDetails: { uuid, first_name, last_name, email, user_role }
+                token, user: { uuid, first_name, last_name, email, user_role }
             })
         }
 
@@ -168,13 +167,14 @@ router.delete('/deleteBulkUsers', async (req, res) => {
 });
 
 //for fetching users by uuid
-router.get('/userById/:userId', auth, isAuth, isAdmin, async (req, res) => {
+router.get('/userById/:userId', auth, isAuth, async (req, res) => {
     try {
         const result = await exeQuery(getUserById('users'), req.params.userId);
-        req.profile = result[0];
-        res.json({
+        console.log(result[0]);
+        if (result) req.profile = result[0];
+        return res.json({
             user: req.profile
-        })
+        });
     } catch (e) {
         console.log(e);
         return res.status(500).json({
