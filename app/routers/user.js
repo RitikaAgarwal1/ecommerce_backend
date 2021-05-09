@@ -24,6 +24,7 @@ router.post('/signin', async (req, res) => {
         });
     }
     try {
+        console.log(req.body);
         await signin.validateAsync(req.body);
         const emailid = req.body.email;
         const password = req.body.password;
