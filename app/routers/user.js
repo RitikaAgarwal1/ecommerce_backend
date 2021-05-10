@@ -6,7 +6,8 @@ const fs = require('fs');
 const { exeQuery, getConnection } = require('../library/db');
 const { insertQuery, fetchAllData, deleteById, deleteBySelection, getUserByEmail, getUserById } = require('../library/dbQuery');
 const jwt = require('jsonwebtoken');//to generate signed token
-const {auth, isAuth} = require('../library/auth');
+const { auth, isAuth } = require('../library/auth');
+const { createBuffer } = require('../library/upload');
 
 //for signing out
 router.get('/signout', async (req, res) => {
@@ -69,26 +70,32 @@ router.post('/register', async (req, res) => {
         });
     }
     try {
-        const body = {
-            first_name: req.body.first_name,
-            last_name: req.body.last_name,
-            phone: req.body.phone,
-            email: req.body.email,
-            pwd: req.body.pwd,
-            address: req.body.address,
-            user_role: req.body.user_role,
+        let body = await createBuffer(req);
+        let bufferpic = body.pic ? body.pic.buffer : fs.readFileSync(__dirname + "/assets/avatar.png");
+        let filetype = body.pic ? body.pic.fileType : 'image/png';
+
+        body = {
+            first_name: body.fields.first_name,
+            last_name: body.fields.last_name,
+            phone: body.fields.phone,
+            email: body.fields.email,
+            pwd: body.fields.pwd,
+            address: body.fields.address,
+            user_role: body.fields.user_role,
             created_on: new Date(),
-            company_name: req.body.company_name,
+            company_name: body.fields.company_name,
             uuid: uuidv1(),
-            pic: req.body.pic ? req.body.pic : fs.readFileSync(__dirname + "/assets/avatar.png")
+            pic: JSON.stringify({buffer: bufferpic, fileType: filetype})
         };
+
+        console.log(body);
         await registration.validateAsync(body);
 
         const result = await exeQuery(insertQuery('users'), body);
         console.log(result);
         res.status(200).send({
             message: 'Successfully posted!',
-            data: req.body
+            data: body
         });
     } catch (err) {
         if (err.isJoi) {

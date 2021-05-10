@@ -8,7 +8,7 @@ const createBuffer = async (req) => {
             form.keepExtensions = true;
             form.parse(req, (err, fields, files) => {
                 if (err) {
-                    console.log('error  at form parsing', err);
+                    console.log('error at form parsing', err);
                     reject({
                         error: 'Image could not be uploaded!'
                     });
@@ -20,6 +20,18 @@ const createBuffer = async (req) => {
                     }
                     resolve(result);
                 }
+
+                if (files.pic) {
+                    const result = {
+                        fields,
+                        pic: {
+                            buffer: fs.readFileSync(files.pic.path),
+                            fileType: files.pic.type
+                        }
+                    }
+                    resolve(result);
+                }
+                resolve(result = {fields});
             })
         } catch (e) {
             console.log('catch error', e.message);

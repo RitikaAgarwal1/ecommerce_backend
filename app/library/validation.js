@@ -12,7 +12,7 @@ const registration = Joi.object({
     created_on: Joi.date(),
     company_name: Joi.string(),
     uuid: Joi.string(),
-    pic: Joi.any()
+    pic: Joi.string()
 });
 
 //for validating signin payload

@@ -12,7 +12,11 @@ router.post('/addProduct', async (req, res) => {
         });
     }
     try {
-        const body = {
+        let body = await createBuffer(req);
+        body.pic.buffer = body.pic.buffer ? body.pic.buffer : fs.readFileSync(__dirname + "/assets/avatar.png");
+        body.pic.fileType = body.pic.fileType ? body.pic.fileType : 'image/png';
+
+        body = {
             title: req.body.title,
             price: req.body.price,
             quantity: req.body.quantity,
@@ -26,7 +30,7 @@ router.post('/addProduct', async (req, res) => {
             detail: req.body.detail,
             brand: req.body.brand,
             size: req.body.size,
-            pic: req.body.pic
+            pic: JSON.stringify({buffer: body.pic.buffer, fileType: body.pic.fileType})
         };
         await productValidate.validateAsync(body);
         const result = await exeQuery(insertQuery('products'), body);
