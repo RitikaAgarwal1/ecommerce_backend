@@ -4,10 +4,12 @@ const router = new express.Router();
 const { registration, bulkDeleteValidate, signin } = require('../library/validation');
 const fs = require('fs');
 const { exeQuery, getConnection } = require('../library/db');
-const { insertQuery, fetchAllData, deleteById, deleteBySelection, getUserByEmail, getUserById } = require('../library/dbQuery');
+const { insertQuery, fetchAllData, deleteById, deleteBySelection, fetchDataByKey } = require('../library/dbQuery');
 const jwt = require('jsonwebtoken');//to generate signed token
 const { auth, isAuth } = require('../library/auth');
 const { createBuffer } = require('../library/upload');
+
+let userDetails;
 
 //for signing out
 router.get('/signout', async (req, res) => {
@@ -29,7 +31,7 @@ router.post('/signin', async (req, res) => {
         await signin.validateAsync(req.body);
         const emailid = req.body.email;
         const password = req.body.password;
-        const userDetails = await exeQuery(getUserByEmail('users'), emailid);
+        const userDetails = await exeQuery(fetchDataByKey('users'), ['email', emailid]);
         if (userDetails.length == 0) {
             res.status(400).json({
                 Error: "User with this email does not exist. Kindly register yourself"
@@ -85,7 +87,7 @@ router.post('/register', async (req, res) => {
             created_on: new Date(),
             company_name: body.fields.company_name,
             uuid: uuidv1(),
-            pic: JSON.stringify({buffer: bufferpic, fileType: filetype})
+            pic: JSON.stringify({ buffer: bufferpic, fileType: filetype })
         };
 
         console.log(body);
@@ -114,9 +116,13 @@ router.post('/register', async (req, res) => {
 //for fetching user details
 router.get('/userDetails', async (req, res) => {
     try {
-        const result = await exeQuery(fetchAllData('users'));
-        console.log(result);
-        res.send(result);
+        if (Object.keys(req.query).length!= 0) {
+            const result = await exeQuery(fetchDataByKey('users'), [req.query.field, req.query.value]);
+            res.send(result);
+        } else {
+            const result = await exeQuery(fetchAllData('users'));
+            res.send(result);
+        }
     } catch (e) {
         console.log('error', e);
         res.status(500).send({
@@ -177,12 +183,28 @@ router.delete('/deleteBulkUsers', async (req, res) => {
 //for fetching users by uuid
 router.get('/userById/:userId', auth, isAuth, async (req, res) => {
     try {
-        const result = await exeQuery(getUserById('users'), req.params.userId);
-        console.log(result[0]);
+        const result = await exeQuery(fetchDataByKey('users'), ['uuid', req.params.userId]);
+        //console.log(result[0]);
         if (result) req.profile = result[0];
+        //console.log(JSON.parse(result[0].pic));
         return res.json({
             user: req.profile
         });
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({
+            Error: e
+        });
+    }
+});
+
+//for fetching users by uuid
+router.get('/userImageByUuid', async (req, res) => {
+    try {
+        const result = await exeQuery(fetchDataByKey('users'), [req.query.field, req.query.value]);
+        res.set('Content-Type', JSON.parse(result[0].pic).fileType);
+        res.send(JSON.parse(result[0].pic).buffer);
+        //console.log(JSON.parse(result[0].pic).fileType);
     } catch (e) {
         console.log(e);
         return res.status(500).json({

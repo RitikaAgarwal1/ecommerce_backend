@@ -1,4 +1,3 @@
-const jwt = require('jsonwebtoken');
 const expressJwt = require('express-jwt');//for authentication check
 
 exports.auth = expressJwt({

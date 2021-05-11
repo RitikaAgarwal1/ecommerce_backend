@@ -8,6 +8,11 @@ const fetchAllData = (tableName) => {
     return `SELECT * FROM ${tableName}`;
 }
 
+//for fetching all data based on column name
+const fetchDataByKey = (tableName) => {
+    return `SELECT * FROM ${tableName} WHERE ?? = ?`;
+}
+
 //for inserting bulk data
 const insertBulkData = (tableName, cols) => {
     return `INSERT INTO ${tableName} (${cols}) VALUES ?`;
@@ -28,16 +33,6 @@ const deleteAllData = (tableName) => {
     return `DELETE FROM ${tableName}`;
 }
 
-//for fetching user details using email
-const getUserByEmail = (tableName) => {
-    return `SELECT * from ${tableName} WHERE email = ?`;
-}
-
-//for fetching user details using uuid
-const getUserById = (tableName) => {
-    return `SELECT * from ${tableName} WHERE uuid = ?`;
-}
-
 module.exports = {
     insertQuery,
     fetchAllData,
@@ -45,6 +40,5 @@ module.exports = {
     deleteById,
     deleteBySelection,
     deleteAllData,
-    getUserByEmail,
-    getUserById
+    fetchDataByKey
 };

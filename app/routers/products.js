@@ -21,7 +21,7 @@ router.post('/addProduct', async (req, res) => {
             price: req.body.price,
             quantity: req.body.quantity,
             availiblity: req.body.availiblity,
-            is_new: req.body.is_new,
+            created_on: new Date(),
             color: req.body.color,
             seller_id: req.body.seller_id,
             offer: req.body.offer,
@@ -75,7 +75,7 @@ router.post('/addBulkProduct', async (req, res) => {
         });
     }
     try {
-        const model = { title: null, price: null, quantity: null, availiblity: null, is_new: null, color: null, seller_id: null, offer: null, shipping_price: null, category: null, detail: null, brand: null, size: null, pic:null };
+        const model = { title: null, price: null, quantity: null, availiblity: null, created_on: new Date(), color: null, seller_id: null, offer: null, shipping_price: null, category: null, detail: null, brand: null, size: null, pic:null };
 
         let reqBody = req.body.map(e => {
             const reqData = Object.assign(model, e);
