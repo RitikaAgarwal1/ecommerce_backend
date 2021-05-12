@@ -42,7 +42,7 @@ router.post('/signin', async (req, res) => {
             });
         } else {
             const token = jwt.sign({ _id: userDetails[0].uuid }, process.env.JWT_SECRET);
-            res.cookie('access-token', token, { expire: new Date() + 9999 });
+            res.cookie('access-token', token, { expiresIn: "20000" });
             const { uuid, first_name, last_name, email, user_role } = userDetails[0];
             res.json({
                 token, user: { uuid, first_name, last_name, email, user_role }
@@ -204,7 +204,7 @@ router.get('/userImageByUuid', async (req, res) => {
         const result = await exeQuery(fetchDataByKey('users'), [req.query.field, req.query.value]);
         res.set('Content-Type', JSON.parse(result[0].pic).fileType);
         res.send(JSON.parse(result[0].pic).buffer);
-        //console.log(JSON.parse(result[0].pic).fileType);
+        console.log(Buffer.isBuffer(JSON.parse(result[0].pic).buffer));
     } catch (e) {
         console.log(e);
         return res.status(500).json({
