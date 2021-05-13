@@ -73,8 +73,6 @@ router.post('/register', async (req, res) => {
     }
     try {
         let body = await createBuffer(req);
-        let bufferpic = body.pic ? body.pic.buffer : fs.readFileSync(__dirname + "/assets/avatar.png");
-        let filetype = body.pic ? body.pic.fileType : 'image/png';
 
         body = {
             first_name: body.fields.first_name,
@@ -87,7 +85,9 @@ router.post('/register', async (req, res) => {
             created_on: new Date(),
             company_name: body.fields.company_name,
             uuid: uuidv1(),
-            pic: JSON.stringify({ buffer: bufferpic, fileType: filetype })
+            buffer: body.buffer ? body.buffer : fs.readFileSync(__dirname + "/assets/avatar.png"),
+            fileType: body.fileType ? body.fileType : 'image/png'
+            //pic: JSON.stringify({ buffer: bufferpic, fileType: filetype })
         };
 
         console.log(body);
@@ -116,7 +116,7 @@ router.post('/register', async (req, res) => {
 //for fetching user details
 router.get('/userDetails', async (req, res) => {
     try {
-        if (Object.keys(req.query).length!= 0) {
+        if (Object.keys(req.query).length != 0) {
             const result = await exeQuery(fetchDataByKey('users'), [req.query.field, req.query.value]);
             res.send(result);
         } else {
@@ -202,9 +202,8 @@ router.get('/userById/:userId', auth, isAuth, async (req, res) => {
 router.get('/userImageByUuid', async (req, res) => {
     try {
         const result = await exeQuery(fetchDataByKey('users'), [req.query.field, req.query.value]);
-        res.set('Content-Type', JSON.parse(result[0].pic).fileType);
-        res.send(JSON.parse(result[0].pic).buffer);
-        console.log(Buffer.isBuffer(JSON.parse(result[0].pic).buffer));
+        res.set('Content-Type', result[0].fileType);
+        res.send(result[0].buffer);
     } catch (e) {
         console.log(e);
         return res.status(500).json({

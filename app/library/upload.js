@@ -24,10 +24,12 @@ const createBuffer = async (req) => {
                 if (files.pic) {
                     const result = {
                         fields,
-                        pic: {
-                            buffer: fs.readFileSync(files.pic.path),
-                            fileType: files.pic.type
-                        }
+                        buffer: fs.readFileSync(files.pic.path),
+                        fileType: files.pic.type
+                        // pic: {
+                        //     buffer: fs.readFileSync(files.pic.path),
+                        //     fileType: files.pic.type
+                        // }
                     }
                     resolve(result);
                 }

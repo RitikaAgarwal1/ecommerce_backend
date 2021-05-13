@@ -12,7 +12,8 @@ const registration = Joi.object({
     created_on: Joi.date(),
     company_name: Joi.string(),
     uuid: Joi.string(),
-    pic: Joi.string()
+    buffer: Joi.binary(),
+    fileType: Joi.string()
 });
 
 //for validating signin payload
@@ -36,7 +37,8 @@ const productValidate = Joi.object({
     detail: Joi.string().required(),
     brand: Joi.string().required(),
     size: Joi.string().required().uppercase(),
-    pic: Joi.string().required()
+    buffer: Joi.binary(),
+    fileType: Joi.string()
 });
 
 //for validating bulk product payload
@@ -55,7 +57,8 @@ const bulkProductValidate = Joi.array().items(
         detail: Joi.string().required(),
         brand: Joi.string().required(),
         size: Joi.string().required().uppercase(),
-        pic: Joi.string().required()
+        buffer: Joi.binary(),
+        fileType: Joi.string()
     })
 )
 
