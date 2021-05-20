@@ -198,7 +198,7 @@ router.get('/userById/:userId', auth, isAuth, async (req, res) => {
     }
 });
 
-//for fetching users by uuid
+//for fetching user images by uuid
 router.get('/userImageByUuid', async (req, res) => {
     try {
         const result = await exeQuery(fetchDataByKey('users'), [req.query.field, req.query.value]);

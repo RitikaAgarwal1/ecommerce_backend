@@ -2,7 +2,9 @@ const express = require('express');
 const router = new express.Router();
 const { productValidate, bulkProductValidate, bulkDeleteValidate } = require('../library/validation');
 const { exeQuery, getConnection } = require('../library/db');
-const { insertQuery, fetchAllData, insertBulkData, deleteById, deleteBySelection } = require('../library/dbQuery');
+const { insertQuery, fetchAllData, insertBulkData, deleteById, deleteBySelection, fetchDataByKey } = require('../library/dbQuery');
+const { createBuffer } = require('../library/upload');
+const { auth, isAuth } = require('../library/auth');
 
 //for adding product details
 router.post('/addProduct', async (req, res) => {
@@ -13,31 +15,31 @@ router.post('/addProduct', async (req, res) => {
     }
     try {
         let body = await createBuffer(req);
-        body.pic.buffer = body.pic.buffer ? body.pic.buffer : fs.readFileSync(__dirname + "/assets/avatar.png");
-        body.pic.fileType = body.pic.fileType ? body.pic.fileType : 'image/png';
 
         body = {
-            title: req.body.title,
-            price: req.body.price,
-            quantity: req.body.quantity,
-            availiblity: req.body.availiblity,
+            title: body.fields.title,
+            price: body.fields.price,
+            quantity: body.fields.quantity,
+            availiblity: body.fields.availiblity,
             created_on: new Date(),
-            color: req.body.color,
-            seller_id: req.body.seller_id,
-            offer: req.body.offer,
-            shipping_price: req.body.shipping_price,
-            category: req.body.category,
-            detail: req.body.detail,
-            brand: req.body.brand,
-            size: req.body.size,
-            pic: JSON.stringify({buffer: body.pic.buffer, fileType: body.pic.fileType})
+            color: body.fields.color,
+            seller_id: body.fields.seller_id,
+            offer: body.fields.offer,
+            shipping_price: body.fields.shipping_price,
+            category: body.fields.category,
+            detail: body.fields.detail,
+            brand: body.fields.brand,
+            size: body.fields.size,
+            buffer: body.buffer,
+            fileType: body.fileType
         };
         await productValidate.validateAsync(body);
+
         const result = await exeQuery(insertQuery('products'), body);
         console.log(result);
         res.status(200).send({
             message: 'Successfully posted!',
-            data: req.body
+            data: body
         });
     } catch (err) {
         if (err.isJoi) {
@@ -152,6 +154,37 @@ router.delete('/deleteBulkProducts', async (req, res) => {
             });
         }
     };
+});
+
+//for fetching product image by id
+router.get('/productImageByid', async (req, res) => {
+    try {
+        const result = await exeQuery(fetchDataByKey('products'), [req.query.field, req.query.value]);
+        res.set('Content-Type', result[0].fileType);
+        res.send(result[0].buffer);
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({
+            Error: e
+        });
+    }
+});
+
+//for fetching products by user uuid
+router.get('/productById/:userId', auth, isAuth, async (req, res) => {
+    try {
+        const result = await exeQuery(fetchDataByKey('products'), ['seller_id', req.params.userId]);
+        console.log(result[0]);
+        if (result) req.profile = result[0];
+        return res.json({
+            user: req.profile
+        });
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({
+            Error: e
+        });
+    }
 });
 
 module.exports = router;
