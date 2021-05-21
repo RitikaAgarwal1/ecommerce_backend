@@ -171,14 +171,10 @@ router.get('/productImageByid', async (req, res) => {
 });
 
 //for fetching products by user uuid
-router.get('/productById/:userId', auth, isAuth, async (req, res) => {
+router.get('/productBykey', async (req, res) => {
     try {
-        const result = await exeQuery(fetchDataByKey('products'), ['seller_id', req.params.userId]);
-        console.log(result[0]);
-        if (result) req.profile = result[0];
-        return res.json({
-            user: req.profile
-        });
+        const result = await exeQuery(fetchDataByKey('products'), [req.query.field, req.query.value]);
+        return res.send(result);
     } catch (e) {
         console.log(e);
         return res.status(500).json({
