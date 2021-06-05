@@ -1,22 +1,20 @@
 const mysql = require('mysql');
 
 const conn = mysql.createPool({
-    host: 'bi8lv1zmd9vrr7kw13qs-mysql.services.clever-cloud.com',
-    user: 'uudolryxhcqygeoc',
-    database: 'bi8lv1zmd9vrr7kw13qs',
-    password: '3WmuNuhoTxco61S8ttw4'
+    host: process.env.HOST,
+    user: process.env.USER,
+    database: process.env.DB,
+    password: process.env.PASSWORD
 });
 
 //getting mysql connection
-
-const getConnection = () => {
+const connection = () => {
     return conn;
 }
 
 //executing queries
-
 const exeQuery = async (query, body = {}) => {
-    console.log('db.js', query, body);
+    //console.log('db.js', query, body);
     return new Promise(async (resolve, reject) => {
         try {
             conn.query(query, body, (error, results) => {
@@ -24,7 +22,7 @@ const exeQuery = async (query, body = {}) => {
                     console.log('query error', error.message);
                     reject(error.message);
                 };
-                console.log(results);
+                //console.log(results);
                 resolve(results);
             });
         } catch (e) {
@@ -34,7 +32,26 @@ const exeQuery = async (query, body = {}) => {
     });
 }
 
+//updating queries
+const updateQuery = async (obj) => {
+    return new Promise(async (reslove, reject) => {
+        try {
+            let objKeys = Object.keys(obj);
+            let maxLength = objKeys.length;
+            let query = ``;
+            for (let i = 0; i < maxLength; i++) {
+                query += `"${objKeys[i]}" = ? `;
+                if (i != maxLength - 1) query += ', ';
+            };
+            reslove([query, Object.values(obj)]);
+        } catch (err) {
+            reject(err)
+        }
+    });
+}
+
 module.exports = {
     exeQuery,
-    getConnection
+    connection,
+    updateQuery
 };

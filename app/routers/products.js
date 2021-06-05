@@ -1,7 +1,7 @@
 const express = require('express');
 const router = new express.Router();
 const { productValidate, bulkProductValidate, bulkDeleteValidate } = require('../library/validation');
-const { exeQuery, getConnection } = require('../library/db');
+const { exeQuery } = require('../library/db');
 const { insertQuery, fetchAllData, insertBulkData, deleteById, deleteBySelection, fetchDataByKey } = require('../library/dbQuery');
 const { createBuffer } = require('../library/upload');
 const { auth, isAuth } = require('../library/auth');

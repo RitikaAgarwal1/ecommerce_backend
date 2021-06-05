@@ -13,6 +13,11 @@ const fetchDataByKey = (tableName) => {
     return `SELECT * FROM ${tableName} WHERE ?? = ?`;
 }
 
+//for fetching all data based on column name and limit
+const fetchDataWithLimit = (tableName, order) => {
+    return `SELECT * FROM ${tableName} WHERE ?? = ? ORDER BY ?? ${order} LIMIT ? OFFSET ?`
+}
+
 //for inserting bulk data
 const insertBulkData = (tableName, cols) => {
     return `INSERT INTO ${tableName} (${cols}) VALUES ?`;
@@ -33,6 +38,11 @@ const deleteAllData = (tableName) => {
     return `DELETE FROM ${tableName}`;
 }
 
+//for filtering or searching data
+const filterFromData = (tableName) => {
+    return `SELECT * from ${tableName} WHERE company_name LIKE ?`
+}
+
 module.exports = {
     insertQuery,
     fetchAllData,
@@ -40,5 +50,7 @@ module.exports = {
     deleteById,
     deleteBySelection,
     deleteAllData,
-    fetchDataByKey
+    fetchDataByKey,
+    fetchDataWithLimit,
+    filterFromData
 };

@@ -3,13 +3,11 @@ const uuidv1 = require('uuidv1');
 const router = new express.Router();
 const { registration, bulkDeleteValidate, signin } = require('../library/validation');
 const fs = require('fs');
-const { exeQuery, getConnection } = require('../library/db');
-const { insertQuery, fetchAllData, deleteById, deleteBySelection, fetchDataByKey } = require('../library/dbQuery');
+const { exeQuery } = require('../library/db');
+const { insertQuery, fetchAllData, deleteById, deleteBySelection, fetchDataByKey, fetchDataWithLimit } = require('../library/dbQuery');
 const jwt = require('jsonwebtoken');//to generate signed token
 const { auth, isAuth } = require('../library/auth');
 const { createBuffer } = require('../library/upload');
-
-let userDetails;
 
 //for signing out
 router.get('/signout', async (req, res) => {
@@ -113,12 +111,17 @@ router.post('/register', async (req, res) => {
     };
 });
 
-//for fetching user details
+//for fetching all user details
 router.get('/userDetails', async (req, res) => {
     try {
         if (Object.keys(req.query).length != 0) {
-            const result = await exeQuery(fetchDataByKey('users'), [req.query.field, req.query.value]);
-            res.send(result);
+            if (req.query.limit) {
+                const result = await exeQuery(fetchDataWithLimit('users', req.query.order), [req.query.field, req.query.value, req.query.order_by, Number(req.query.limit), Number(req.query.offset)]);
+                res.send(result);
+            } else {
+                const result = await exeQuery(fetchDataByKey('users'), [req.query.field, req.query.value]);
+                res.send(result);
+            }
         } else {
             const result = await exeQuery(fetchAllData('users'));
             res.send(result);

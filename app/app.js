@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const userRouter = require('./routers/user');
 const productRouter = require('./routers/products');
 const promotionRouter = require('./routers/promotion');
+const commonRouter = require('./routers/common');
 
 const port = process.env.PORT || 3000;
 
@@ -42,3 +43,4 @@ app.use(cookieParser());
 app.use(userRouter);
 app.use(productRouter);
 app.use(promotionRouter);
+app.use(commonRouter);
