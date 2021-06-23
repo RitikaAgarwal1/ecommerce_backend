@@ -5,7 +5,6 @@ const fs = require('fs');
 const { exeQuery } = require('../library/db');
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-// const sendgrid = require('sendgrid')(process.env.SENDGRID_USER, process.env.SENDGRID_API_KEY);
 
 //for saving images in a folder
 // const fs = require('fs');
