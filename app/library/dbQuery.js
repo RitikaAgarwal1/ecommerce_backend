@@ -40,7 +40,12 @@ const deleteAllData = (tableName) => {
 
 //for filtering or searching data
 const filterFromData = (tableName) => {
-    return `SELECT * from ${tableName} WHERE company_name LIKE ?`
+    return `SELECT * from ${tableName} WHERE company_name LIKE ?`;
+}
+
+//for updating data
+const updateData = (tableName) => {
+    return `UPDATE ${tableName} SET ? WHERE ?? = ?`;
 }
 
 module.exports = {
@@ -52,5 +57,6 @@ module.exports = {
     deleteAllData,
     fetchDataByKey,
     fetchDataWithLimit,
-    filterFromData
+    filterFromData,
+    updateData
 };

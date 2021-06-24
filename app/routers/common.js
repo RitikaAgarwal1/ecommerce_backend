@@ -1,6 +1,6 @@
 const express = require('express');
 const router = new express.Router();
-const { filterFromData } = require('../library/dbQuery');
+const { filterFromData, updateData } = require('../library/dbQuery');
 const fs = require('fs');
 const { exeQuery } = require('../library/db');
 const sgMail = require('@sendgrid/mail');
@@ -57,6 +57,17 @@ router.post('/sendMail', (req, res) => {
             }
         }
     })();
+});
+
+router.put('/updateByColName', async (req, res) => {
+    try {
+        const result = await exeQuery(updateData(req.body.tableName), [req.body.obj, req.body.key, req.body.value]);
+        console.log(result);
+        res.send(result);
+    } catch (err) {
+        console.log(err);
+        res.send(err);
+    }
 });
 
 module.exports = router;

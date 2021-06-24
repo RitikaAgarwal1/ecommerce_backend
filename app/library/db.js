@@ -33,26 +33,7 @@ const exeQuery = async (query, body = {}) => {
     });
 }
 
-//updating queries
-const updateQuery = async (obj) => {
-    return new Promise(async (reslove, reject) => {
-        try {
-            let objKeys = Object.keys(obj);
-            let maxLength = objKeys.length;
-            let query = ``;
-            for (let i = 0; i < maxLength; i++) {
-                query += `"${objKeys[i]}" = ? `;
-                if (i != maxLength - 1) query += ', ';
-            };
-            reslove([query, Object.values(obj)]);
-        } catch (err) {
-            reject(err)
-        }
-    });
-}
-
 module.exports = {
     exeQuery,
-    connection,
-    updateQuery
+    connection
 };
