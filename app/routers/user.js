@@ -4,7 +4,7 @@ const router = new express.Router();
 const { registration, bulkDeleteValidate, signin } = require('../library/validation');
 const fs = require('fs');
 const { exeQuery } = require('../library/db');
-const { insertQuery, fetchAllData, deleteById, deleteBySelection, fetchDataByKey, fetchDataWithLimit } = require('../library/dbQuery');
+const { insertQuery, fetchAllData, deleteById, deleteBySelection, fetchDataByKey, fetchDataWithLimit, deleteCol } = require('../library/dbQuery');
 const jwt = require('jsonwebtoken');//to generate signed token
 const { auth, isAuth } = require('../library/auth');
 const { createBuffer } = require('../library/upload');
@@ -84,8 +84,9 @@ router.post('/register', async (req, res) => {
             company_name: body.fields.company_name,
             uuid: uuidv1(),
             buffer: body.buffer ? body.buffer : fs.readFileSync(__dirname + "/assets/avatar.png"),
-            fileType: body.fileType ? body.fileType : 'image/png'
-            //pic: JSON.stringify({ buffer: bufferpic, fileType: filetype })
+            fileType: body.fileType ? body.fileType : 'image/png',
+            verify_token: body.fields.is_verified? null: uuidv1(),
+            is_verified: body.fields.is_verified? body.fields.is_verified: false
         };
 
         console.log(body);
@@ -109,6 +110,21 @@ router.post('/register', async (req, res) => {
             });
         }
     };
+});
+
+// for verifying email id after registration
+router.get('/verify-email', async (req, res) => {
+    try{
+        const user = await exeQuery(fetchDataByKey('users'), ['verify_token', req.query.token]);
+        if (!user) return res.send({Error: 'Token is invalid. Please contact us for assistance.'});
+        if (!user.verify_token == null) return res.send({Error: 'Token has expired.'});
+        user.verify_token = null;
+        user.is_verified = 1;
+        res.send({Message: 'Email id verified'})
+    } catch (error){
+        console.log(error.message);
+        res.send(error.message);
+    }
 });
 
 //for fetching all user details

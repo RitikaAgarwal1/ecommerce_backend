@@ -1,8 +1,9 @@
 const express = require('express');
 const app = express();
-require('dotenv').config();
 const cors = require('cors');
+require('dotenv').config();
 const cookieParser = require('cookie-parser');
+const helmet = require("helmet");
 const userRouter = require('./routers/user');
 const productRouter = require('./routers/products');
 const promotionRouter = require('./routers/promotion');
@@ -10,7 +11,6 @@ const commonRouter = require('./routers/common');
 
 const port = process.env.PORT || 3000;
 
-//app.use(cors());
 app.options('*', cors());
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -40,6 +40,7 @@ app.listen(port, () =>
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(helmet());
 app.use(userRouter);
 app.use(productRouter);
 app.use(promotionRouter);

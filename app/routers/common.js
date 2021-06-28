@@ -25,7 +25,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 //for fetching product details
 router.get('/filterData', async (req, res) => {
     try {
-        const result = await exeQuery(filterFromData(req.query.tableName), [`%${req.query.value}%`]);
+        const result = await exeQuery(filterFromData(req.query.tableName), [req.query.key, `%${req.query.value}%`]);
         console.log(result);
         res.send(result);
     } catch (e) {
