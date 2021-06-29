@@ -14,8 +14,9 @@ const registration = Joi.object({
     uuid: Joi.string(),
     buffer: Joi.binary(),
     fileType: Joi.string(),
-    verify_token: Joi.string().required(),
-    is_verified: Joi.boolean().required()
+    verify_token: Joi.string(),
+    is_verified: Joi.boolean().required(),
+    is_approved: Joi.boolean()
 });
 
 //for validating signin payload

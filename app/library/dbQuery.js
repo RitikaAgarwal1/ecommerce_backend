@@ -50,7 +50,7 @@ const updateData = (tableName) => {
 
 //for deleting column
 const deleteCol = (tableName) => {
-    return `ALTER TABLE ${tableName} DROP COLUMN ??`;
+    return `ALTER TABLE ${tableName} DROP COLUMN ?? WHERE ?? =?`;
 }
 
 module.exports = {

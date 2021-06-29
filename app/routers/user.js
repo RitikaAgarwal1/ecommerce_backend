@@ -30,21 +30,27 @@ router.post('/signin', async (req, res) => {
         const emailid = req.body.email;
         const password = req.body.password;
         const userDetails = await exeQuery(fetchDataByKey('users'), ['email', emailid]);
-        if (userDetails.length == 0) {
-            res.status(400).json({
-                Error: "User with this email does not exist. Kindly register yourself"
-            });
-        } else if (userDetails[0].pwd != password) {
-            res.status(401).json({
-                Error: "Email and password doesnt match!"
-            });
+        if (userDetails[0].is_verified == 1 || userDetails[0].is_approved == 1) {
+            if (userDetails.length == 0) {
+                res.status(400).json({
+                    Error: "User with this email does not exist. Kindly register yourself"
+                });
+            } else if (userDetails[0].pwd != password) {
+                res.status(401).json({
+                    Error: "Email and password doesnt match!"
+                });
+            } else {
+                const token = jwt.sign({ _id: userDetails[0].uuid }, process.env.JWT_SECRET);
+                res.cookie('access-token', token, { expiresIn: "20000" });
+                const { uuid, first_name, last_name, email, user_role } = userDetails[0];
+                res.json({
+                    token, user: { uuid, first_name, last_name, email, user_role }
+                })
+            }
         } else {
-            const token = jwt.sign({ _id: userDetails[0].uuid }, process.env.JWT_SECRET);
-            res.cookie('access-token', token, { expiresIn: "20000" });
-            const { uuid, first_name, last_name, email, user_role } = userDetails[0];
-            res.json({
-                token, user: { uuid, first_name, last_name, email, user_role }
-            })
+            res.status(403).json({
+                message: "You need to verify your email id or get approved by Admin"
+            });
         }
 
     } catch (err) {
@@ -85,9 +91,12 @@ router.post('/register', async (req, res) => {
             uuid: uuidv1(),
             buffer: body.buffer ? body.buffer : fs.readFileSync(__dirname + "/assets/avatar.png"),
             fileType: body.fileType ? body.fileType : 'image/png',
-            verify_token: body.fields.is_verified? null: uuidv1(),
-            is_verified: body.fields.is_verified? body.fields.is_verified: false
+            is_verified: body.fields.is_verified? body.fields.is_verified : false,
+            is_approved: body.fields.is_verified? true : false,
+            verify_token: body.fields.is_verified? 'none' : uuidv1()
         };
+
+        if (body.user_role == 'USER') return body.is_approved = true;
 
         console.log(body);
         await registration.validateAsync(body);
@@ -114,16 +123,16 @@ router.post('/register', async (req, res) => {
 
 // for verifying email id after registration
 router.get('/verify-email', async (req, res) => {
-    try{
+    try {
         const user = await exeQuery(fetchDataByKey('users'), ['verify_token', req.query.token]);
-        if (!user) return res.send({Error: 'Token is invalid. Please contact us for assistance.'});
-        if (!user.verify_token == null) return res.send({Error: 'Token has expired.'});
-        user.verify_token = null;
-        user.is_verified = 1;
-        res.send({Message: 'Email id verified'})
-    } catch (error){
+        if (user.length == 0) return res.status(404).send({ Message: 'Token is invalid. Please contact us for assistance.' });
+        if (user[0].verify_token === 'none') return res.status(403).send({ Message: 'Token has expired.' });
+        user.verify_token = 'none';
+        user.is_verified = true;
+        res.send({ Message: 'Congratulations! Email id got verified. You may now log in.' })
+    } catch (error) {
         console.log(error.message);
-        res.send(error.message);
+        res.status(500).send(error.message);
     }
 });
 
