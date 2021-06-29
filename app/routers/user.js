@@ -4,7 +4,7 @@ const router = new express.Router();
 const { registration, bulkDeleteValidate, signin } = require('../library/validation');
 const fs = require('fs');
 const { exeQuery } = require('../library/db');
-const { insertQuery, fetchAllData, deleteById, deleteBySelection, fetchDataByKey, fetchDataWithLimit, deleteCol } = require('../library/dbQuery');
+const { insertQuery, fetchAllData, deleteById, deleteBySelection, fetchDataByKey, fetchDataWithLimit, updateData } = require('../library/dbQuery');
 const jwt = require('jsonwebtoken');//to generate signed token
 const { auth, isAuth } = require('../library/auth');
 const { createBuffer } = require('../library/upload');
@@ -30,7 +30,7 @@ router.post('/signin', async (req, res) => {
         const emailid = req.body.email;
         const password = req.body.password;
         const userDetails = await exeQuery(fetchDataByKey('users'), ['email', emailid]);
-        if (userDetails[0].is_verified == 1 || userDetails[0].is_approved == 1) {
+        if (userDetails[0].is_verified == 1 && userDetails[0].is_approved == 1) {
             if (userDetails.length == 0) {
                 res.status(400).json({
                     Error: "User with this email does not exist. Kindly register yourself"
@@ -129,8 +129,11 @@ router.get('/verify-email', async (req, res) => {
         const user = await exeQuery(fetchDataByKey('users'), ['verify_token', req.query.token]);
         if (user.length == 0) return res.status(404).send({ Message: 'Token is invalid. Please contact us for assistance.' });
         if (user[0].verify_token === 'none') return res.status(403).send({ Message: 'Token has expired.' });
-        user.verify_token = 'none';
-        user.is_verified = true;
+        const obj = {
+            verify_token: 'none',
+            is_verified: true
+        }
+        await exeQuery(updateData('users'), [obj, 'uuid', user[0].uuid]);
         res.send({ Message: 'Congratulations! Email id got verified. You may now log in.' })
     } catch (error) {
         console.log(error.message);
