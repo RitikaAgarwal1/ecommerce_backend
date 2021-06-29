@@ -96,9 +96,11 @@ router.post('/register', async (req, res) => {
             verify_token: body.fields.is_verified? 'none' : uuidv1()
         };
 
-        if (body.user_role == 'USER') return body.is_approved = true;
+        console.log('line99', body);
 
-        console.log(body);
+        if (body.user_role == 'USER') body.is_approved = true;
+
+        console.log('body', body);
         await registration.validateAsync(body);
 
         const result = await exeQuery(insertQuery('users'), body);
