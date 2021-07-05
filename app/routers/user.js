@@ -4,7 +4,7 @@ const router = new express.Router();
 const { registration, bulkDeleteValidate, signin } = require('../library/validation');
 const fs = require('fs');
 const { exeQuery } = require('../library/db');
-const { insertQuery, fetchAllData, deleteById, deleteBySelection, fetchDataByKey, fetchDataWithLimit, updateData } = require('../library/dbQuery');
+const { insertQuery, fetchAllData, deleteById, deleteBySelection, fetchDataByKey, fetchDataWithLimit, updateData, fetchDataWithApproval, filterAdmins } = require('../library/dbQuery');
 const jwt = require('jsonwebtoken');//to generate signed token
 const { auth, isAuth } = require('../library/auth');
 const { createBuffer } = require('../library/upload');
@@ -133,34 +133,12 @@ router.get('/verify-email', async (req, res) => {
             verify_token: 'none',
             is_verified: true
         }
-        await exeQuery(updateData('users'), [obj, 'uuid', user[0].uuid]);
+        const resp = await exeQuery(updateData('users'), [obj, 'uuid', user[0].uuid]);
+        console.log(resp);
         res.send({ Message: 'Congratulations! Email id got verified. You may now log in.' })
     } catch (error) {
         console.log(error.message);
         res.status(500).send(error.message);
-    }
-});
-
-//for fetching all user details
-router.get('/userDetails', async (req, res) => {
-    try {
-        if (Object.keys(req.query).length != 0) {
-            if (req.query.limit) {
-                const result = await exeQuery(fetchDataWithLimit('users', req.query.order), [req.query.field, req.query.value, req.query.order_by, Number(req.query.limit), Number(req.query.offset)]);
-                res.send(result);
-            } else {
-                const result = await exeQuery(fetchDataByKey('users'), [req.query.field, req.query.value]);
-                res.send(result);
-            }
-        } else {
-            const result = await exeQuery(fetchAllData('users'));
-            res.send(result);
-        }
-    } catch (e) {
-        console.log('error', e);
-        res.status(500).send({
-            Error: e.message
-        });
     }
 });
 
@@ -231,16 +209,29 @@ router.get('/userById/:userId', auth, isAuth, async (req, res) => {
     }
 });
 
-//for fetching user images by uuid
-router.get('/userImageByUuid', async (req, res) => {
+//for fetching data based on user role and approval status
+router.get('/userByApproval', async (req, res) => {
+    try{
+        const result = await exeQuery(fetchDataWithApproval(req.query.order), [req.query.user_role, req.query.approval_status, Number(req.query.limit), Number(req.query.offset)]);
+        console.log(result);
+        res.send(result);
+    } catch(error){
+        console.log(error);
+        res.status(500).send(error);
+    }
+});
+
+//for fetching admin details
+router.get('/filterAdminData', async (req, res) => {
     try {
-        const result = await exeQuery(fetchDataByKey('users'), [req.query.field, req.query.value]);
-        res.set('Content-Type', result[0].fileType);
-        res.send(result[0].buffer);
+        console.log(req.query);
+        const result = await exeQuery(filterAdmins(), [`%${req.query.value}%`, Number(req.query.approval_status)]);
+        console.log(result);
+        res.send(result);
     } catch (e) {
-        console.log(e);
-        return res.status(500).json({
-            Error: e
+        console.log('error', e);
+        res.status(500).send({
+            Error: e.message
         });
     }
 });

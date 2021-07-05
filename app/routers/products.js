@@ -156,20 +156,6 @@ router.delete('/deleteBulkProducts', async (req, res) => {
     };
 });
 
-//for fetching product image by id
-router.get('/productImageByid', async (req, res) => {
-    try {
-        const result = await exeQuery(fetchDataByKey('products'), [req.query.field, req.query.value]);
-        res.set('Content-Type', result[0].fileType);
-        res.send(result[0].buffer);
-    } catch (e) {
-        console.log(e);
-        return res.status(500).json({
-            Error: e
-        });
-    }
-});
-
 //for fetching products by user uuid
 router.get('/productBykey', async (req, res) => {
     try {
