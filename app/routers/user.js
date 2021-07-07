@@ -4,7 +4,7 @@ const router = new express.Router();
 const { registration, bulkDeleteValidate, signin } = require('../library/validation');
 const fs = require('fs');
 const { exeQuery } = require('../library/db');
-const { insertQuery, fetchAllData, deleteById, deleteBySelection, fetchDataByKey, fetchDataWithLimit, updateData, fetchDataWithApproval, filterAdmins } = require('../library/dbQuery');
+const { insertQuery, deleteById, deleteBySelection, fetchDataByKey, deleteUserAndProducts, updateData, fetchDataWithApproval, filterAdmins } = require('../library/dbQuery');
 const jwt = require('jsonwebtoken');//to generate signed token
 const { auth, isAuth } = require('../library/auth');
 const { createBuffer } = require('../library/upload');
@@ -238,15 +238,15 @@ router.get('/filterAdminData', async (req, res) => {
 
 //for deleting user and its products, calling procedure
 router.delete('/deleteUserWithProducts', async (req, res) => {
-    console.log('delete');
     if (!req.query.id) {
         res.status(404).send({
             Error: 'Id is required!'
         });
     }
     try {
-        let response = await exeQuery(`call deleteUserDetails(${Number(req.query.id)})`);
-        console.log(response);
+        console.log(req.query.id);
+        let response = await exeQuery(deleteUserAndProducts(), [req.query.id]);
+        //console.log(response);
         res.send({
             message: `Successfully deleted!`
         });

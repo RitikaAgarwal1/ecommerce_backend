@@ -63,6 +63,11 @@ const deleteCol = (tableName) => {
     return `ALTER TABLE ${tableName} DROP COLUMN ?? WHERE ?? =?`;
 }
 
+//for deleting user and products together
+const deleteUserAndProducts = () => {
+    return `call deleteUserDetails(?)`;
+}
+
 module.exports = {
     insertQuery,
     fetchAllData,
@@ -76,5 +81,6 @@ module.exports = {
     updateData,
     deleteCol,
     fetchDataWithApproval,
-    filterAdmins
+    filterAdmins,
+    deleteUserAndProducts
 };

@@ -55,20 +55,6 @@ router.post('/addProduct', async (req, res) => {
     };
 });
 
-//for fetching product details
-router.get('/productDetails', async (req, res) => {
-    try {
-        const result = await exeQuery(fetchAllData('products'));
-        console.log(result);
-        res.send(result);
-    } catch (e) {
-        console.log('error', e);
-        res.status(500).send({
-            Error: e.message
-        });
-    }
-});
-
 //for adding multiple product details
 router.post('/addBulkProduct', async (req, res) => {
     if (!req.body) {
