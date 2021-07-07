@@ -3,6 +3,7 @@ const router = new express.Router();
 const { filterFromData, updateData, fetchDataWithLimit, fetchDataByKey, fetchAllData } = require('../library/dbQuery');
 const fs = require('fs');
 const { exeQuery } = require('../library/db');
+const { createBuffer } = require('../library/upload');
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
@@ -68,7 +69,24 @@ router.put('/updateByColName', async (req, res) => {
         res.send(result);
     } catch (err) {
         console.log(err);
-        res.send(err);
+        res.status(500).send(err);
+    }
+});
+
+//update image
+router.put('/updateImage', async (req, res) => {
+    try {
+        let body = await createBuffer(req);
+        const obj = {
+            "buffer": body.buffer,
+            "fileType": body.fileType
+        }
+        const result = await exeQuery(updateData(body.fields.tableName), [obj, body.fields.key, body.fields.value]);
+        //console.log(result);
+        res.send(result);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send(err);
     }
 });
 

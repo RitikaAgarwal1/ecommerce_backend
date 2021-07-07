@@ -236,4 +236,26 @@ router.get('/filterAdminData', async (req, res) => {
     }
 });
 
+//for deleting user and its products, calling procedure
+router.delete('/deleteUserWithProducts', async (req, res) => {
+    console.log('delete');
+    if (!req.query.id) {
+        res.status(404).send({
+            Error: 'Id is required!'
+        });
+    }
+    try {
+        let response = await exeQuery(`call deleteUserDetails(${Number(req.query.id)})`);
+        console.log(response);
+        res.send({
+            message: `Successfully deleted!`
+        });
+    } catch (e) {
+        console.log('error', e);
+        res.status(500).send({
+            Error: e
+        });
+    }
+});
+
 module.exports = router;
