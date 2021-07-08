@@ -142,17 +142,4 @@ router.delete('/deleteBulkProducts', async (req, res) => {
     };
 });
 
-//for fetching products by user uuid
-router.get('/productBykey', async (req, res) => {
-    try {
-        const result = await exeQuery(fetchDataByKey('products'), [req.query.field, req.query.value]);
-        return res.send(result);
-    } catch (e) {
-        console.log(e);
-        return res.status(500).json({
-            Error: e
-        });
-    }
-});
-
 module.exports = router;
