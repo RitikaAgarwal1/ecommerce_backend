@@ -1,17 +1,11 @@
 const mysql = require('mysql');
 
 const conn = mysql.createPool({
-    connectionLimit: 10,
     host: process.env.HOST,
     user: process.env.USER,
     database: process.env.DB,
     password: process.env.PASSWORD
 });
-
-//getting mysql connection
-const connection = () => {
-    return conn;
-}
 
 //executing queries
 const exeQuery = async (query, body = {}) => {
@@ -34,6 +28,5 @@ const exeQuery = async (query, body = {}) => {
 }
 
 module.exports = {
-    exeQuery,
-    connection
+    exeQuery
 };

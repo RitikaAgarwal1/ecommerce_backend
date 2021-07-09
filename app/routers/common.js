@@ -27,7 +27,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 router.get('/filterData', async (req, res) => {
     try {
         const result = await exeQuery(filterFromData(req.query.tableName), [req.query.key, `%${req.query.value}%`]);
-        console.log(result);
+        //console.log(result);
         res.send(result);
     } catch (e) {
         console.log('error', e);
@@ -65,7 +65,7 @@ router.post('/sendMail', (req, res) => {
 router.put('/updateByColName', async (req, res) => {
     try {
         const result = await exeQuery(updateData(req.body.tableName), [req.body.obj, req.body.key, req.body.value]);
-        console.log(result);
+        //console.log(result);
         res.send(result);
     } catch (err) {
         console.log(err);
@@ -117,7 +117,7 @@ router.get('/details', async (req, res) => {
 router.get('/imageByid', async (req, res) => {
     try {
         const result = await exeQuery(fetchDataByKey(req.query.tableName), [req.query.field, req.query.value]);
-        console.log(result);
+        //console.log(result);
         res.set('Content-Type', result[0].fileType);
         res.send(result[0].buffer);
     } catch (e) {

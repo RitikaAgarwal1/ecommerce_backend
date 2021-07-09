@@ -68,6 +68,11 @@ const deleteUserAndProducts = () => {
     return `call deleteUserDetails(?)`;
 }
 
+//for filtering products
+const filterProducts = () => {
+    return `SELECT * FROM products WHERE (color IN ('black', 'pink') AND brand IN ('Favicon Limited')) LIMIT 10 OFFSET 0`;
+}
+
 module.exports = {
     insertQuery,
     fetchAllData,
@@ -82,5 +87,6 @@ module.exports = {
     deleteCol,
     fetchDataWithApproval,
     filterAdmins,
-    deleteUserAndProducts
+    deleteUserAndProducts,
+    filterProducts
 };

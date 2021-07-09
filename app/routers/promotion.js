@@ -59,7 +59,7 @@ router.post('/addBanner', async (req, res) => {
     try {
         const body = await createBuffer(req);
         const result = await exeQuery(insertQuery('promotion'), body);
-        console.log(result);
+        //console.log(result);
         res.status(200).send({
             message: 'Successfully added banner!'
         });
@@ -73,7 +73,7 @@ router.post('/addBanner', async (req, res) => {
 router.get('/bannerDetails', async (req, res) => {
     try {
         const result = await exeQuery(fetchAllData('promotion'));
-        console.log(result);
+        //console.log(result);
         if (result.length > 0) {
             res.set('Content-Type', result[0].fileType);
             res.send(result[0].buffer);
@@ -94,7 +94,7 @@ router.get('/bannerDetails', async (req, res) => {
 router.delete('/deleteBanner', async (req, res) => {
     try {
         const result = await exeQuery(deleteAllData('promotion'));
-        console.log(result);
+        //console.log(result);
         if (result.affectedRows == 0) {
             res.send({
                 message: "There is no image for deleting!"

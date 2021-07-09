@@ -25,7 +25,6 @@ router.post('/signin', async (req, res) => {
         });
     }
     try {
-        console.log(req.body);
         await signin.validateAsync(req.body);
         const emailid = req.body.email;
         const password = req.body.password;
@@ -96,15 +95,12 @@ router.post('/register', async (req, res) => {
             verify_token: body.fields.is_verified? 'none' : uuidv1()
         };
 
-        console.log('line99', body);
-
         if (body.user_role == 'USER') body.is_approved = true;
 
-        console.log('body', body);
         await registration.validateAsync(body);
 
         const result = await exeQuery(insertQuery('users'), body);
-        console.log(result);
+        //console.log(result);
         res.status(200).send({
             message: 'Successfully posted!',
             data: body
@@ -134,7 +130,7 @@ router.get('/verify-email', async (req, res) => {
             is_verified: true
         }
         const resp = await exeQuery(updateData('users'), [obj, 'uuid', user[0].uuid]);
-        console.log(resp);
+        //console.log(resp);
         res.send({ Message: 'Congratulations! Email id got verified. You may now log in.' })
     } catch (error) {
         console.log(error.message);
@@ -151,7 +147,7 @@ router.delete('/deleteUser', async (req, res) => {
     }
     try {
         let response = await exeQuery(deleteById('users'), [req.query.id]);
-        console.log(response);
+        //console.log(response);
         res.send({
             message: `Successfully deleted!`
         });
@@ -173,7 +169,7 @@ router.delete('/deleteBulkUsers', async (req, res) => {
     try {
         await bulkDeleteValidate.validateAsync(req.body);
         const result = await exeQuery(deleteBySelection('users'), [req.body.ids]);
-        console.log('result', result);
+        //console.log('result', result);
         res.send({
             message: `Successfully deleted ids ${req.body.ids.join(', ')}`
         });
@@ -213,7 +209,7 @@ router.get('/userById/:userId', auth, isAuth, async (req, res) => {
 router.get('/userByApproval', async (req, res) => {
     try{
         const result = await exeQuery(fetchDataWithApproval(req.query.order), [req.query.user_role, req.query.approval_status, Number(req.query.limit), Number(req.query.offset)]);
-        console.log(result);
+        //console.log(result);
         res.send(result);
     } catch(error){
         console.log(error);
@@ -224,9 +220,8 @@ router.get('/userByApproval', async (req, res) => {
 //for fetching admin details
 router.get('/filterAdminData', async (req, res) => {
     try {
-        console.log(req.query);
         const result = await exeQuery(filterAdmins(), [`%${req.query.value}%`, Number(req.query.approval_status)]);
-        console.log(result);
+        //console.log(result);
         res.send(result);
     } catch (e) {
         console.log('error', e);
@@ -244,7 +239,6 @@ router.delete('/deleteUserWithProducts', async (req, res) => {
         });
     }
     try {
-        console.log(req.query.id);
         let response = await exeQuery(deleteUserAndProducts(), [req.query.id]);
         //console.log(response);
         res.send({

@@ -2,7 +2,7 @@ const express = require('express');
 const router = new express.Router();
 const { productValidate, bulkProductValidate, bulkDeleteValidate } = require('../library/validation');
 const { exeQuery } = require('../library/db');
-const { insertQuery, fetchAllData, insertBulkData, deleteById, deleteBySelection, fetchDataByKey } = require('../library/dbQuery');
+const { insertQuery, filterProducts, insertBulkData, deleteById, deleteBySelection } = require('../library/dbQuery');
 const { createBuffer } = require('../library/upload');
 const { auth, isAuth } = require('../library/auth');
 
@@ -36,7 +36,7 @@ router.post('/addProduct', async (req, res) => {
         await productValidate.validateAsync(body);
 
         const result = await exeQuery(insertQuery('products'), body);
-        console.log(result);
+        //console.log(result);
         res.status(200).send({
             message: 'Successfully posted!',
             data: body
@@ -73,7 +73,7 @@ router.post('/addBulkProduct', async (req, res) => {
         await bulkProductValidate.validateAsync(req.body);
 
         const result = await exeQuery(insertBulkData('products', Object.keys(model).join(', ')), [reqBody]);
-        console.log('result', result);
+        //console.log('result', result);
         res.status(200).send({
             message: `Successfully posted ${result.affectedRows} rows!`,
             data: req.body
@@ -102,7 +102,7 @@ router.delete('/deleteProduct', async (req, res) => {
     }
     try {
         let response = await exeQuery(deleteById('products'), [req.query.id]);
-        console.log(response);
+        //console.log(response);
         res.send({
             message: `Successfully deleted!`
         });
@@ -124,7 +124,7 @@ router.delete('/deleteBulkProducts', async (req, res) => {
     try {
         await bulkDeleteValidate.validateAsync(req.body);
         const result = await exeQuery(deleteBySelection('products'), [req.body.ids]);
-        console.log('result', result);
+        //console.log('result', result);
         res.send({
             message: `Successfully deleted ids ${req.body.ids.join(', ')}`
         });
@@ -140,6 +140,20 @@ router.delete('/deleteBulkProducts', async (req, res) => {
             });
         }
     };
+});
+
+//for filtering based on selection
+router.post('/filterOnSelection', async (req, res) => {
+    try{
+        const response = await exeQuery(filterProducts(), [req.body.data]);
+        console.log(response);
+        res.send(response);
+    } catch (error){
+        console.log(error);
+        res.status(500).send({
+            Error: e.message
+        });
+    }
 });
 
 module.exports = router;
