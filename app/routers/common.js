@@ -113,6 +113,29 @@ router.get('/details', async (req, res) => {
     }
 });
 
+//for fetching all details
+router.get('/userdetails', async (req, res) => {
+    try {
+        if (Object.keys(req.query).length != 1) {
+            if (req.query.limit) {
+                const result = await exeQuery(fetchDataWithLimit('users', req.query.order), [req.query.field, req.query.value, req.query.order_by, Number(req.query.limit), Number(req.query.offset)]);
+                res.send(result);
+            } else {
+                const result = await exeQuery(fetchDataByKey('users'), [req.query.field, req.query.value]);
+                res.send(result);
+            }
+        } else if(Object.keys(req.query).length == 1){
+            const result = await exeQuery(fetchAllData('users'));
+            res.send(result);
+        }
+    } catch (e) {
+        console.log('error', e);
+        res.status(500).send({
+            Error: e.message
+        });
+    }
+});
+
 //for fetching product image by id
 router.get('/imageByid', async (req, res) => {
     try {
